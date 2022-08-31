@@ -115,7 +115,8 @@ tab_models %>%
 
 ???
 
-* Indirect: use response data from areas other than the area for which an estimate is required. Leverage correlation in mortality between neighboring areas.
+* Use the data from the totality of areas to provide more reliable
+estimates in each of the constituent areas. Leverage correlation in mortality between neighboring areas.
 
 * B-splines (Eilers & Marx) and D-splines (Schmertmann) not indirect estimation
 
