@@ -543,6 +543,7 @@ df.areas.lx.sim %>%
 ```{r rank_dpmt, out.width = "100%"}
 
 # e0 ranking evolution over time
+# Female
 areas.ord <- df.areas.lx.sim %>% 
         filter(year == 1,
                age == 0, 
@@ -550,9 +551,10 @@ areas.ord <- df.areas.lx.sim %>%
         arrange(desc(ex)) %>% 
         pull(area)
 # by area
-df.areas.lx.sim %>% 
-        filter(age == 0) %>% 
-        group_by(year, sex) %>% 
+fig1 <- df.areas.lx.sim %>% 
+        filter(age == 0,
+               sex == "f") %>% 
+        group_by(year) %>% 
         arrange(desc(ex),
                 .by_group = TRUE) %>% 
         mutate(rank = 1:94) %>% 
@@ -561,7 +563,6 @@ df.areas.lx.sim %>%
                              levels = areas.ord,
                              labels = areas.ord)) %>% 
         ggplot(aes(x = year, y = rank, col = area, group = area)) +
-        facet_wrap(~ sex) +
         geom_line(size = 1) +
         geom_point(shape = 1) +
         theme_bw() +
@@ -570,6 +571,36 @@ df.areas.lx.sim %>%
         scale_color_viridis_d() +
         labs(y = expression("Rank(" * e^0 * ")"),
              x = "Year")
+# Male
+areas.ord <- df.areas.lx.sim %>% 
+        filter(year == 1,
+               age == 0, 
+               sex == "m") %>% 
+        arrange(desc(ex)) %>% 
+        pull(area)
+# by area
+fig2 <- df.areas.lx.sim %>% 
+        filter(age == 0,
+               sex == "m") %>% 
+        group_by(year) %>% 
+        arrange(desc(ex),
+                .by_group = TRUE) %>% 
+        mutate(rank = 1:94) %>% 
+        ungroup() %>% 
+        mutate(area = factor(area,
+                             levels = areas.ord,
+                             labels = areas.ord)) %>% 
+        ggplot(aes(x = year, y = rank, col = area, group = area)) +
+        geom_line(size = 1) +
+        geom_point(shape = 1) +
+        theme_bw() +
+        theme(legend.position = "none") +
+        scale_y_continuous(limits = c(1, 94), breaks = c(1, seq(5, 90, 5), 94)) +
+        scale_color_viridis_d() +
+        labs(y = expression("Rank(" * e^0 * ")"),
+             x = "Year")
+
+plot_grid(fig1, fig2, labels = c("f", "m"))
 ```
 
 
@@ -639,7 +670,7 @@ class: inverse, center, middle
 .left[
 `r fontawesome::fa("at")` .link-email[[benjamin-samuel.schluter@uclouvain.be](benjamin-samuel.schluter@uclouvain.be)]
 
-`r fontawesome::fa("slideshare")` .link-email[[Slides]()]
+`r fontawesome::fa("slideshare")` .link-email[[http://benjisamschlu.github.io/BSPS2022-models-comparison/slides.html](http://benjisamschlu.github.io/BSPS2022-models-comparison/slides.html)]
 
 `r fontawesome::fa("github")` .link-email[[@benjisamschlu](https://github.com/benjisamschlu)]
 ]
