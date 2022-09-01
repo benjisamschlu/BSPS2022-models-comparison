@@ -232,10 +232,6 @@ class: inverse, center, middle
 # Simulation setup
 
 
-???
-
-* We needed a spatial structure for our simulation `r fontawesome::fa("arrow-right")` France: admin1=region, admin2=department
-
 
 
 ---
@@ -282,6 +278,8 @@ Mortality of 12 regions = Mortality of 12 HMD countries in 2003
 
 
 ???
+
+* Spatial structure of France for our simulation `r fontawesome::fa("arrow-right")` Admin1=region, admin2=department
 
 * Countries selected such that range(e0)<5y
 
@@ -489,7 +487,7 @@ ggplot() +
                       size = "Simulated"),
                   alpha = .7) +
         scale_color_viridis_d(option = "E", begin = 0.1, end = 0.8) +
-        scale_size_manual(name = "Brass pars",
+        scale_size_manual(name = "Brass parameters",
                           values = c("Estimated (HMD)" = 1.5, "Simulated" = 0.5)) +
         theme_bw() +
         labs(y = "Value",
@@ -559,6 +557,8 @@ df.areas.lx.sim %>%
 * Realistic mortality decreases over time
 
 * Realistic disparity in $e^0$
+
+* Temporal stability in performance
 
 
 
