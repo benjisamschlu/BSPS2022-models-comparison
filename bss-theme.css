@@ -42,6 +42,18 @@ h1, h2, h3 {
 .rightcol30 + * {
   clear: both;
 }
+/* Custom 2 columns */
+.leftcol65 {
+  float: left;
+  width: 64%;
+}
+.rightcol35 {
+  float: right;
+  width: 34%;
+}
+.rightcol35 + * {
+  clear: both;
+}
 /* White background for leaflet */
 .leaflet-container {
     background: #f3f3f3;
