@@ -88,12 +88,6 @@ Why do we need accurate mortality estimates by age and subnational areas?
 
 .highlight[Models without area-level covariates]: endogeneity bias
 
-
-???
-
-* Use the data from the totality of areas to provide more reliable
-estimates in each of the constituent areas. 
-
 --
 
 ```{r tab_models}
@@ -195,7 +189,7 @@ $m_x^{sim}$ known (simulated)
 
 * Population sizes: $D_x^{sim} \sim Poisson(m_x^{sim} \cdot E_x)$ `r fontawesome::fa("arrow-right")` $\Delta E_x$ 
 
-* Clustered and random spatial correlation
+* Clustered and random spatial correlation 
 
 * Disparity in mortality
 
@@ -211,6 +205,8 @@ $m_x^{sim}$ known (simulated)
 * Coherent mortality age schedules
 
 * Realistic range of life expectancy at birth within the country 
+
+* Time dimension
 
 * Mortality decreases over time
 
@@ -280,6 +276,8 @@ Mortality of 12 regions = Mortality of 12 HMD countries in 2003
 ???
 
 * Spatial structure of France for our simulation `r fontawesome::fa("arrow-right")` Admin1=region, admin2=department
+
+* Our aim is to simulate mortality age schedules for each of the 94 departments
 
 * Countries selected such that range(e0)<5y
 
@@ -367,7 +365,7 @@ ggplot(df.lx, aes(x = age, y = lx, group = pars, col = pars)) +
 
 ???
 
-* For each department we used the Brass relational model using as standard, the HMD country corresponding to the region to which it belongs, to generate a survival curve and hence, a mortality age schedule
+* For each department we used the Brass relational model using as standard, the HMD country corresponding to the region to which it belongs, to generate its survival curve and hence, its mortality age schedule (__Show on map__)
 
 * a: level of mortality
 
@@ -375,7 +373,7 @@ ggplot(df.lx, aes(x = age, y = lx, group = pars, col = pars)) +
 
 --
 
-Random draws of a and b for each department and sex?
+Independent random draws of a and b over time for each department and sex?
 
 
 
@@ -385,7 +383,7 @@ Random draws of a and b for each department and sex?
 # Correlation between Brass parameters
 
 .leftcol65[
-```{r corr_brass_pars, out.width = "80%"}
+```{r corr_brass_pars, out.width = "75%"}
 df.brass.pars <- readRDS("../../data/simulation/brass_pars_t.rda")
 ctries.shown <- c("BEL", "GBR_NP")
 # Plots Brass pars
@@ -393,18 +391,19 @@ df.brass.pars %>%
   filter(country %in% ctries.shown) %>% 
   mutate(sex = ifelse(sex == "f", "female", "male")) %>% 
   ggplot(aes(x = a, y = b)) +
-        geom_point(aes(col = year)) +
+        geom_point(aes(col = year, shape = sex)) +
         theme_bw() +
         theme() +
         labs(col = "Year",
              title = "a and b estimated over 2004-2017",
              subtitle = expression(l[x]*" of 2003 used as standards")) +
         scale_color_viridis_c(option = "C") +
-        facet_wrap(country ~ sex,
+        facet_wrap(~ country,
                    ncol = 2,
                    scales = "free_y") +
         labs(x = "a",
-             y = "b")
+             y = "b",
+             shape = "Gender")
 
 ```
 ]
@@ -421,7 +420,7 @@ df.brass.pars %>%
 --
 
 .leftcol65[
-.highlight[Simulate]
+.highlight[For each department simulate]
 $$\begin{bmatrix}
 a_t^f \\
 b_t^f \\
@@ -449,7 +448,9 @@ b_{t-1}^m + \hat{drift}^m
 ]
 
 
+???
 
+* Simulated a and b over 10 years for both gender and used the Brass relational model to obtain survival curve and hence, mortality age schedule for a department. Repeat that process for each departments.
 
 ---
 class: inverse, center, middle
@@ -473,22 +474,24 @@ ggplot() +
         geom_line(data = df.brass.pars %>% 
                           filter(year <= 2013,
                                  country %in% ctries.shown) %>% 
-                          mutate(sex = ifelse(sex == "f", "female", "male")) %>% 
+                          mutate(sex = ifelse(sex == "f", "female", "male"),
+                                 year = year - 2003) %>% 
                           pivot_longer(a:b, names_to = "par"),
-                  aes(x = year, y = value, col = sex, size = "Estimated (HMD)")) +
+                  aes(x = year, y = value, col = sex, size = "Estimated (HMD, 2004-13)")) +
         geom_line(data = df.areas.pars.sim %>% 
                           rename("country" = reg) %>% 
                           filter(country %in% ctries.shown) %>% 
-                          mutate(year = as.numeric(year) + 2003,
+                          mutate(year = as.numeric(year),
                                  grouping = paste(unit, sex, sep="-"),
                                  sex = ifelse(sex == "f", "female", "male")) %>% 
                           pivot_longer(a:b, names_to = "par"),
                   aes(x = year, y = value, col = sex, group = grouping,
-                      size = "Simulated"),
+                      size = "Simulated (Department)"),
                   alpha = .7) +
         scale_color_viridis_d(option = "E", begin = 0.1, end = 0.8) +
         scale_size_manual(name = "Brass parameters",
-                          values = c("Estimated (HMD)" = 1.5, "Simulated" = 0.5)) +
+                          values = c("Estimated (HMD, 2004-13)" = 1.5, "Simulated (Department)" = 0.5)) +
+  scale_x_continuous(limits = c(1, 10), breaks = seq(1, 10, 1)) +
         theme_bw() +
         labs(y = "Value",
              x = "Year",
@@ -499,7 +502,7 @@ ggplot() +
 
 ???
 
-* Less up and down in generated than estimated pars due to scaling of covariance matrices
+* Less volatility in generated than estimated parameters due to the scaling of covariance matrices
 
 
 
@@ -537,17 +540,15 @@ df.areas.lx.sim %>%
 df.areas.lx.sim %>% 
         filter(age == 0) %>%
         mutate(sex = ifelse(sex == "f", "female", "male")) %>% 
-        ggplot(aes(x = year, y = ex)) +
+        ggplot(aes(x = year, y = ex, col = reg)) +
         facet_wrap(~ sex,
                    scales = "free_y") +
-        geom_jitter(aes(col = reg),
-                    width = 0.2) +
+        geom_jitter(width = 0.2) +
         theme_bw() +
-        theme(legend.title = element_blank()) +
         scale_color_viridis_d(option = "C") +
   labs(y = expression(e^0),
        x = "Year",
-       col = "Region")
+       col = "''Region''")
 
 ```
 
@@ -565,6 +566,12 @@ df.areas.lx.sim %>%
 
 ---
 
+# Limitations
+
+* Brass relational model: linear transformation
+
+* Creates similarity within region
+
 # Next steps
 
 * Define different scenario
@@ -575,11 +582,6 @@ df.areas.lx.sim %>%
 
 * Development of a new model
 
-# Limitations
-
-* Temporal covariance used for spatial covariance
-
-* Creates similarity within region
 
 
 
