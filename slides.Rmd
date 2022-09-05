@@ -275,9 +275,11 @@ Mortality of 12 regions = Mortality of 12 HMD countries in 2003
 
 ???
 
-* Spatial structure of France for our simulation `r fontawesome::fa("arrow-right")` Admin1=region, admin2=department
+* Spatial structure of France for our simulation `r fontawesome::fa("arrow-right")` Admin1= 12 regions, admin2= 94 departments
 
 * Our aim is to simulate mortality age schedules for each of the 94 departments
+
+* 1st step: associate to each region a mortality age schedule from a country in the HMD in 2003 for both male and female.
 
 * Countries selected such that range(e0)<5y
 
@@ -305,7 +307,7 @@ $logit(l_x^{department}) = a + b \cdot logit(l^{region}_x)$
 
 .rightcol30[
 .small[
-$region \equiv HMD~country$ <br/> $by~sex$
+$region \equiv HMD~country~2003$ <br/> $by~sex$
 ]
 ]
 
@@ -365,7 +367,7 @@ ggplot(df.lx, aes(x = age, y = lx, group = pars, col = pars)) +
 
 ???
 
-* For each department we used the Brass relational model using as standard, the HMD country corresponding to the region to which it belongs, to generate its survival curve and hence, its mortality age schedule (__Show on map__)
+* For each department we used the Brass relational model using as standard, the HMD country in 2003 corresponding to the region to which it belongs, to generate its survival curve and hence, its mortality age schedule (__Show on map__)
 
 * a: level of mortality
 
@@ -450,7 +452,14 @@ b_{t-1}^m + \hat{drift}^m
 
 ???
 
-* Simulated a and b over 10 years for both gender and used the Brass relational model to obtain survival curve and hence, mortality age schedule for a department. Repeat that process for each departments.
+* ... a and b over 10 years for both gender and then, used the Brass relational model to obtain its survival curves and hence, mortality age schedules. Repeat that process for each departments.
+
+* Drift is the same for departments belonging to the same region. Improvement in mortality differs by region.
+
+* Different covariance matrices and hence, volatility in Brass parameters across regions.
+
+
+
 
 ---
 class: inverse, center, middle
@@ -502,7 +511,7 @@ ggplot() +
 
 ???
 
-* Less volatility in generated than estimated parameters due to the scaling of covariance matrices
+* Less volatility in generated than in estimated parameters: scaling of covariance matrices
 
 
 
